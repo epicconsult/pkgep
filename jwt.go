@@ -127,13 +127,13 @@ func JWTProtected() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		if c.Get("Authorization") == "" {
 			log.Println("Missing or malformed JWT")
-			return HandleErrorResponse(c, InvalidToken, "")
+			return ErrorResponse(c, InvalidToken, "")
 		}
 
 		_, _, err := VerifyTokenHeader(c, "JWT_SECRET_KEY")
 		if err != nil {
 			log.Println("invalid token")
-			return HandleErrorResponse(c, InvalidToken, "")
+			return ErrorResponse(c, InvalidToken, "")
 		}
 		return c.Status(fiber.StatusOK).Next()
 	}

@@ -64,7 +64,7 @@ var StatusCodeMap = map[AppResponseStatus]string{
 	CustomStatus:   "Custom Status",
 }
 
-func HandleErrorResponse(c *fiber.Ctx, appStatus AppResponseStatus, messages ...string) error {
+func ErrorResponse(c *fiber.Ctx, appStatus AppResponseStatus, messages ...string) error {
 
 	var message string
 	if len(messages) > 0 {
@@ -155,7 +155,7 @@ func HandleErrorResponse(c *fiber.Ctx, appStatus AppResponseStatus, messages ...
 	return c.Status(httpStatus).JSON(resError)
 }
 
-func NewSuccessResponse(c *fiber.Ctx, data interface{}, messages ...string) error {
+func SuccessResponse(c *fiber.Ctx, data interface{}, messages ...string) error {
 
 	msg := StatusCodeMap[Success]
 	if len(messages) > 0 {
