@@ -121,3 +121,31 @@ func verifyRS256Token(tokenString string, pubKey *rsa.PublicKey) (*jwt.Token, *V
 
 	return token, claims, err
 }
+
+func JWTProtected() fiber.Handler {
+
+	return func(c *fiber.Ctx) error {
+		if c.Get("Authorization") == "" {
+			log.Println("Missing or malformed JWT")
+			return HandleErrorResponse(c, InvalidToken, "")
+		}
+
+		_, _, err := VerifyTokenHeader(c, "JWT_SECRET_KEY")
+		if err != nil {
+			log.Println("invalid token")
+			return HandleErrorResponse(c, InvalidToken, "")
+		}
+		return c.Status(fiber.StatusOK).Next()
+	}
+}
+
+func JwtLogger() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+
+		NewLogger().LogInformation(HTTPREQEST, c)
+
+		NewHelpers(*NewLogger())
+
+		return c.Next()
+	}
+}

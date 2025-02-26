@@ -38,7 +38,7 @@ const (
 
 var logr *Logger
 
-func SetupLogger() {
+func SetupLogger(appname string) {
 
 	logr = &Logger{
 		Logger:        logrus.New(),
@@ -53,7 +53,7 @@ func SetupLogger() {
 		},
 	})
 	logr.WithFields(logrus.Fields{
-		"app": "idms-management-service",
+		"app": appname,
 	})
 
 	if _, err := os.Stat("logs"); os.IsNotExist(err) {
@@ -72,7 +72,7 @@ func SetupLogger() {
 
 }
 
-func MockLogger() *Logger {
+func MockLogger(appname string) *Logger {
 	logr = &Logger{
 		Logger: logrus.New(),
 	}
@@ -83,7 +83,7 @@ func MockLogger() *Logger {
 		},
 	})
 	logr.WithFields(logrus.Fields{
-		"app": "idms-management-service",
+		"app": appname,
 	})
 	return logr
 }
@@ -228,3 +228,4 @@ func (l Logger) Warn(ctx context.Context, msg string, data ...interface{}) {
 func (l Logger) Error(ctx context.Context, msg string, data ...interface{}) {
 	l.Logger.WithContext(ctx).Errorf(msg, data...)
 }
+
