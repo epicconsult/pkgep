@@ -228,4 +228,3 @@ func (l Logger) Warn(ctx context.Context, msg string, data ...interface{}) {
 func (l Logger) Error(ctx context.Context, msg string, data ...interface{}) {
 	l.Logger.WithContext(ctx).Errorf(msg, data...)
 }
-
