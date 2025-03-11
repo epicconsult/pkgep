@@ -8,7 +8,7 @@ import (
 type LogHeaderContextKey string
 
 const (
-	LogHeader LogHeaderContextKey = "header" // provide helper function to update log header name.
+	LogHeader LogHeaderContextKey = "header" //todo: provide helper function to update log header name.
 )
 
 type LogAction int
@@ -28,7 +28,7 @@ var logActionName = [...]string{
 }
 
 // Core Logger Interface
-type LoggerEpic interface {
+type EpicLogger interface {
 	Info(ctx context.Context, msg string, data ...any)
 	Error(ctx context.Context, msg string, data ...any)
 	Warn(ctx context.Context, msg string, data ...any)
@@ -38,11 +38,11 @@ type LoggerEpic interface {
 }
 
 var (
-	Logger LoggerEpic
+	Logger EpicLogger
 	once   sync.Once
 )
 
-func SetLogger(customLogger LoggerEpic) {
+func SetLogger(customLogger EpicLogger) {
 	once.Do(func() {
 		Logger = customLogger
 	})

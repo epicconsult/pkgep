@@ -19,7 +19,7 @@ const (
 	Timestamp                     // "yyyy-mm-ddT-hh-mm-ss"
 )
 
-type LogrusEpic struct {
+type EpicLogrus struct {
 	logger     *logrus.Logger
 	rotation   RotationType
 	maxSize    int // work only with rotationType set to Timestamp
@@ -31,42 +31,42 @@ type LogrusEpic struct {
 }
 
 // ** Support configuration via "functional options pattern"
-type LogrusOption func(*LogrusEpic)
+type LogrusOption func(*EpicLogrus)
 
 func WithMaxSize(maxSize int) LogrusOption {
-	return func(le *LogrusEpic) {
+	return func(le *EpicLogrus) {
 		le.maxSize = maxSize
 	}
 }
 
 func WithMaxBackups(maxBackups int) LogrusOption {
-	return func(le *LogrusEpic) {
+	return func(le *EpicLogrus) {
 		le.maxBackups = maxBackups
 	}
 }
 
 func WithRotationType(rotationType RotationType) LogrusOption {
-	return func(le *LogrusEpic) {
+	return func(le *EpicLogrus) {
 		le.rotation = rotationType
 	}
 }
 
 func WithAppName(name string) LogrusOption {
-	return func(le *LogrusEpic) {
+	return func(le *EpicLogrus) {
 		le.appName = name
 	}
 }
 
 func WithPath(path string) LogrusOption {
-	return func(le *LogrusEpic) {
+	return func(le *EpicLogrus) {
 		le.path = path
 	}
 }
 
-func NewLogrus(options ...LogrusOption) *LogrusEpic {
+func NewLogrus(options ...LogrusOption) *EpicLogrus {
 
 	// Default configuration.
-	client := LogrusEpic{
+	client := EpicLogrus{
 		rotation:   Date,
 		maxSize:    500,
 		maxBackups: 3,
@@ -117,29 +117,29 @@ func NewLogrus(options ...LogrusOption) *LogrusEpic {
 	return &client
 }
 
-func (l *LogrusEpic) Info(ctx context.Context, msg string, data ...any) {
+func (l *EpicLogrus) Info(ctx context.Context, msg string, data ...any) {
 	// Process context to be log as metadata
 	fields := structToJson(ctx.Value(LogHeader))
 
 	l.logger.WithFields(fields).Info(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) Error(ctx context.Context, msg string, data ...any) {
+func (l *EpicLogrus) Error(ctx context.Context, msg string, data ...any) {
 	fields := structToJson(ctx.Value(LogHeader))
 	l.logger.WithFields(fields).Error(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) Warn(ctx context.Context, msg string, data ...any) {
+func (l *EpicLogrus) Warn(ctx context.Context, msg string, data ...any) {
 	fields := structToJson(ctx.Value(LogHeader))
 	l.logger.WithFields(fields).Warn(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) Trace(ctx context.Context, msg string, data ...any) {
+func (l *EpicLogrus) Trace(ctx context.Context, msg string, data ...any) {
 	fields := structToJson(ctx.Value(LogHeader))
 	l.logger.WithFields(fields).Trace(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any) {
+func (l *EpicLogrus) InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any) {
 	actionName := logActionName[action]
 	fields := structToJson(ctx.Value(LogHeader))
 	fields["action"] = actionName

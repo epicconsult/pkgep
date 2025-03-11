@@ -16,11 +16,11 @@ type GormResponse struct {
 }
 
 type GormLogger struct {
-	epicLogger coreLogger.LoggerEpic
+	epicLogger coreLogger.EpicLogger
 	logLevel   logger.LogLevel
 }
 
-func NewGormLogger(epicLogger coreLogger.LoggerEpic) logger.Interface {
+func NewGormLogger(epicLogger coreLogger.EpicLogger) logger.Interface {
 	return &GormLogger{
 		epicLogger: epicLogger,
 		logLevel:   logger.Info,

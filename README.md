@@ -1,7 +1,32 @@
 # EPIC Go Standard Library
 Collection of Go libraries for Epic-Consulting, Designed with "*Simplicity* and *Flexibility*" in mind.
 
+> [!WARNING]
+## 🚧 Documentation is under contruction!
+
 ## Logger
+EpicLogger is a core interface that centralizes functionality while offering great flexibility. It can be extended to support any logger client. The design aligns with Go's philosophy of promoting simplicity without compromising power.
+
+<details>
+<summary>Contribute & Codebase Exploring?</summary>
+<br>
+## EpicLogger
+<br><br>
+
+```go
+	type EpicLogger interface {
+		Info(ctx context.Context, msg string, data ...any)
+		Error(ctx context.Context, msg string, data ...any)
+		Warn(ctx context.Context, msg string, data ...any)
+		Trace(ctx context.Context, msg string, args ...any)
+
+		InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any)
+	}
+```
+
+Anything that implement this interface can be pass to register Logger client to EpicLogger.
+
+</details>
 
 ### Example
 ```go
