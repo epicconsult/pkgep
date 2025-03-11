@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -24,6 +26,8 @@ type LogrusEpic struct {
 	maxBackups int // work only with rotationType set to Timestamp
 	appName    string
 	path       string // default root running
+	// infoFunc   func() // user can customize logging behavior
+	// errFunc    func()
 }
 
 // ** Support configuration via "functional options pattern"
@@ -113,18 +117,39 @@ func NewLogrus(options ...LogrusOption) *LogrusEpic {
 	return &client
 }
 
-func (l *LogrusEpic) Info(msg string, args ...interface{}) {
-	l.logger.Info(append([]interface{}{msg}, args...)...)
+func (l *LogrusEpic) Info(ctx context.Context, msg string, data ...any) {
+	// Process context to be log as metadata
+	fields := structToJson(ctx.Value(LogHeader))
+
+	l.logger.WithFields(fields).Info(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) Error(msg string, args ...interface{}) {
-	l.logger.Error(append([]interface{}{msg}, args...)...)
+func (l *LogrusEpic) Error(ctx context.Context, msg string, data ...any) {
+	fields := structToJson(ctx.Value(LogHeader))
+	l.logger.WithFields(fields).Error(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) Warn(msg string, args ...interface{}) {
-	l.logger.Warn(append([]interface{}{msg}, args...)...)
+func (l *LogrusEpic) Warn(ctx context.Context, msg string, data ...any) {
+	fields := structToJson(ctx.Value(LogHeader))
+	l.logger.WithFields(fields).Warn(append([]any{msg}, data...)...)
 }
 
-func (l *LogrusEpic) Trace(msg string, args ...interface{}) {
-	l.logger.Trace(append([]interface{}{msg}, args...)...)
+func (l *LogrusEpic) Trace(ctx context.Context, msg string, data ...any) {
+	fields := structToJson(ctx.Value(LogHeader))
+	l.logger.WithFields(fields).Trace(append([]any{msg}, data...)...)
+}
+
+func (l *LogrusEpic) InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any) {
+	actionName := logActionName[action]
+	fields := structToJson(ctx.Value(LogHeader))
+	fields["action"] = actionName
+	l.logger.WithFields(fields).Info(append([]any{msg}, data...)...)
+}
+
+// convert any struct to map.
+func structToJson(st any) map[string]any {
+	data, _ := json.Marshal(st)
+	var kv map[string]any
+	json.Unmarshal(data, &kv)
+	return kv
 }

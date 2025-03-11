@@ -1,24 +1,46 @@
 package logger
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
+type LogHeaderContextKey string
+
+const (
+	LogHeader LogHeaderContextKey = "header" // provide helper function to update log header name.
+)
+
+type LogAction int
+
+const (
+	INBOUND LogAction = iota
+	OUTBOUND
+	DBREQUEST
+	DBRESPONSE
+)
+
+var logActionName = [...]string{
+	"INBOUND",
+	"OUTBOUND",
+	"DBREQUEST",
+	"DBRESPONSE",
+}
+
+// Core Logger Interface
 type LoggerEpic interface {
-	Info(msg string, args ...interface{})
-	Error(msg string, args ...interface{})
-	Warn(msg string, args ...interface{})
-	Trace(msg string, args ...interface{})
+	Info(ctx context.Context, msg string, data ...any)
+	Error(ctx context.Context, msg string, data ...any)
+	Warn(ctx context.Context, msg string, data ...any)
+	Trace(ctx context.Context, msg string, args ...any)
+
+	InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any)
 }
 
 var (
 	Logger LoggerEpic
 	once   sync.Once
 )
-
-// func init() {
-// 	once.Do(func() {
-// 		Logger = NewLogrus() // Use logrus as default log, use default file path
-// 	})
-// }
 
 func SetLogger(customLogger LoggerEpic) {
 	once.Do(func() {

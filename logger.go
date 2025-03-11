@@ -102,6 +102,8 @@ func SetHeaderLog(token *VerifiedToken, c *fiber.Ctx) {
 	logr.Method = c.Method()
 }
 
+
+
 func (l *Logger) LogInformation(Action LogAction, args ...interface{}) {
 	componentName := strings.Split(l.Path, "/")[len(strings.Split(l.Path, "/"))-1]
 	if Action == INBOUND {
