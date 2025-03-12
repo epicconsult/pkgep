@@ -1,5 +1,12 @@
 # EPIC Go Standard Library & Best Practice
-Collection of Go libraries for Epic-Consulting, Designed with "*Simplicity* and *Flexibility*" in mind.
+![gopher](./epic-gopher.png)
+
+Collection of Go libraries for [Epic-Consulting](https://www.epic-consulting.net/), Designed with "*Simplicity* and *Flexibility*" in mind.
+
+## Quick Start
+```bash
+go get github.com/epicconsult/pkgep
+```
 
 
 > ## 🚧 Documentation is under construction! 🚧
