@@ -2,15 +2,15 @@
 Collection of Go libraries for Epic-Consulting, Designed with "*Simplicity* and *Flexibility*" in mind.
 
 
-> ## 🚧 Documentation is under contruction! 🚧
+> ## 🚧 Documentation is under construction! 🚧
 
 ## Table of Contents  
 libraries<br>
-[Logger](##Logger)<br>
-[JWT](##JWT)<br>
+[Logger](#logger)<br>
+[JWT](#jwt)<br>
 
 best practice<br> 
-[Context](##Context)<br>
+[Context](#context)
 
 ## Logger
 > EpicLogger is a core interface that centralizes common logging functionality while offering great flexibility to be extended to support any logger client. <br>The design aligns with Go's philosophy of promoting simplicity without compromising power.
@@ -25,8 +25,8 @@ best practice<br>
 	logger.SetLogger(logrus)
 ```
 
-#### Logrus
-Logrus *(Epic Logrus)* provides "Functional Options Pattern" approach of configuration the instance.
+#### Logrus *(Epic Logrus)* 
+Logrus *(Epic Logrus)* provides "Functional Options Pattern" approach to tweak your logrus instance.
 ```go
 	import (
 		l "github.com/epicconsult/pkgep/logger"
@@ -59,6 +59,9 @@ type LoggerEpic interface {
 > You can pass ```context.Background()``` as default argument to context.
 
 
+## JWT
+
+
 ## Context
 ### What is context and why you should use it?
 [What is context?]()<br>
@@ -73,7 +76,7 @@ This scenario leads to wasted time and resources, which is especially critical i
 
 Context helps solve this issue by propagating signals deep into the application, such as the database interaction layer. When the client disconnects, the repository layer receives a signal to terminate any ongoing operations, preventing unnecessary processing and saving resources. 
 
-![context](./context.png)
+![context](./context-1x.png)
 
 ### How to create context to implement Epic Logger
 You can initially create context in a Middleware right after JWT is decoded into go struct.
