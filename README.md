@@ -1,80 +1,128 @@
-# EPIC Go Standard Library
+# EPIC Go Standard Library & Best Practice
 Collection of Go libraries for Epic-Consulting, Designed with "*Simplicity* and *Flexibility*" in mind.
 
-> [!WARNING]
-## 🚧 Documentation is under contruction!
+
+> ## 🚧 Documentation is under contruction! 🚧
+
+## Table of Contents  
+libraries<br>
+[Logger](##Logger)<br>
+[JWT](##JWT)<br>
+
+best practice<br> 
+[Context](##Context)<br>
 
 ## Logger
-EpicLogger is a core interface that centralizes functionality while offering great flexibility. It can be extended to support any logger client. The design aligns with Go's philosophy of promoting simplicity without compromising power.
+> EpicLogger is a core interface that centralizes common logging functionality while offering great flexibility to be extended to support any logger client. <br>The design aligns with Go's philosophy of promoting simplicity without compromising power.
 
-<details>
-<summary>Contribute & Codebase Exploring?</summary>
-<br>
-## EpicLogger
-<br><br>
-
+### Create Logger Instance.
+```pkgep``` provides [*Logrus*](https://github.com/sirupsen/logrus) as the default logger client that fully implemeted **EpicLogger** interface. you can start using it right away like so.
 ```go
-	type EpicLogger interface {
-		Info(ctx context.Context, msg string, data ...any)
-		Error(ctx context.Context, msg string, data ...any)
-		Warn(ctx context.Context, msg string, data ...any)
-		Trace(ctx context.Context, msg string, args ...any)
+	// create logrus instance.
+	logrus := logger.NewLogrus()
 
-		InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any)
-	}
+	// register logrus as your logger.
+	logger.SetLogger(logrus)
 ```
 
-Anything that implement this interface can be pass to register Logger client to EpicLogger.
-
-</details>
-
-### Example
+#### Logrus
+Logrus *(Epic Logrus)* provides "Functional Options Pattern" approach of configuration the instance.
 ```go
-package main
+	import (
+		l "github.com/epicconsult/pkgep/logger"
+	)
+	// create logrus instance.
+	logrus := l.NewLogrus(
+		l.WithRotationType(l.Timestamp),
+		l.WithAppName("my-api-app"),
+		l.WithMaxSize(500), // max limit log file size in mb.
+		l.WithMaxBackups(5),
+	)
 
-import (
-  "github.com/epicconsult/pkgep/logger"
-)
+	// register logrus as your logger.
+	logger.SetLogger(logrus)
+```
 
-func main() {
-	logger.SetLogger(logger.NewLogrus())
+#### Usage
+Epic Logger is designed to handle metadata within a Context. Every method expects ```Context``` as the first argument. see [How to create Context for my app](#) for fully use Epic Logger at its finest.
+```go
+	// Epic Logger Interface
+type LoggerEpic interface {
+	Info(ctx context.Context, msg string, data ...any)
+	Error(ctx context.Context, msg string, data ...any)
+	Warn(ctx context.Context, msg string, data ...any)
+	Trace(ctx context.Context, msg string, args ...any)
 
-	logger.Logger.Info("Start application...")
-
-  
-	app := fiber.New()
-
-	logger.Logger.Info("Created api server")
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
-	})
-
-	logger.Logger.Info("Api server running on port 3000")
-
-	app.Listen(":3000")
+	InfoWithAction(ctx context.Context, action LogAction, msg string, data ...any)
 }
 ```
-### Logrus
-Logrus is implemented as a default logger client. you can config logrus to suite your need
-* Rotation: log rotation is default to used date based log file ```date```, you can opt to use ```timestamp``` which is more optimization.
+> You can pass ```context.Background()``` as default argument to context.
 
+
+## Context
+### What is context and why you should use it?
+[What is context?]()<br>
+Why you should use it?<br>
+This is an important question to answer. Context is the recommended way to pass data and signals throughout the lifecycle of your application. For an API server, it provides several benefits.
+
+Context carries signals that are bound to specific events. These signals are useful in managing resources efficiently and ensuring proper execution flow.
+### Use Case: Handling Client-Server Connection Termination
+When a connection between a client and an API server is terminated, without a proper mechanism to notify the deeper layers of the application, those layers might continue executing their functions even though no client is waiting for a response.
+
+This scenario leads to wasted time and resources, which is especially critical in cloud computing environments where costs are tied to resource usage.
+
+Context helps solve this issue by propagating signals deep into the application, such as the database interaction layer. When the client disconnects, the repository layer receives a signal to terminate any ongoing operations, preventing unnecessary processing and saving resources. 
+
+![context](./context.png)
+
+### How to create context to implement Epic Logger
+You can initially create context in a Middleware right after JWT is decoded into go struct.
 ```go
-logger.SetLogger(logger.NewLogrus(
-  logger.WithAppName("epic-app"),
-  logger.WithRotationType(logger.Timestamp),
-))
-```
 
-### Implement your own logger client
-You can even provide your own logger client if logrus does not suite your need by implement Standard Logger Interface and pass it to ```SetLogger``` function.
+	type ReqHeader struct {
+		TransactionID string `json:"transaction_id"`
+		Method        string `json:"method"`
+		Path          string `json:"path"`
+		JwtClaim
+	}
 
-```go
-// Standard Logger Interface
-type Logger interface {
-    Info(msg string, args ...interface{})
-    Error(msg string, args ...interface{})
-    Warn(msg string, args ...interface{})
-    Trace(msg string, args ...interface{})
+	type JwtClaim struct {
+		DeviceID string `json:"device_id"`
+		UserID   int    `json:"user_id"`
+	}
+
+	func verifyJwtMiddleware() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+
+		//mock: Verified jwt
+		jwtClaim := JwtClaim{
+			DeviceID: "fake-device-13455ef56535",
+			UserID:   1,
+		}
+
+		reqHeader := ReqHeader{
+			TransactionID: "fake-txnid-3453fdtjgLJj-e4dfd454tdgsdht",
+			Method:        c.Method(),
+			Path:          c.Path(),
+			JwtClaim:      jwtClaim,
+		}
+
+		// Set context
+		// init context with connection with client.
+		connectionCtx, cancel := context.WithCancelCause(c.Context())
+		defer cancel(nil) // terminate signal on client connection terminated.
+
+		// Use Context Value Key provided by Epic Logger package.
+		// The value can be any struct.
+		valueCtx := context.WithValue(connectionCtx, logger.LogHeader, reqHeader)
+
+		// (Optionally) set fiber locals
+		c.Locals("logMetadata", reqHeader)
+
+		// Set context (specific to Fiber)
+		c.SetUserContext(valueCtx)
+
+		return c.Next()
+	}
 }
 ```
