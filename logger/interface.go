@@ -20,6 +20,7 @@ const (
 	DBRESPONSE
 )
 
+// Array get allocated in stack, efficient and faster than heap alloc.
 var logActionName = [...]string{
 	"INBOUND",
 	"OUTBOUND",

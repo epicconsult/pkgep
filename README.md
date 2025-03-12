@@ -5,12 +5,15 @@ Collection of Go libraries for Epic-Consulting, Designed with "*Simplicity* and 
 > ## 🚧 Documentation is under construction! 🚧
 
 ## Table of Contents  
-libraries<br>
-[Logger](#logger)<br>
-[JWT](#jwt)<br>
+Libraries<br>
+* [Logger](#logger)<br>
+* [JWT](#jwt)<br>
+* [File System](#file-system)<br>
 
-best practice<br> 
-[Context](#context)
+Best practices<br> 
+* [Use Context](#context)<br>
+* [How to log 101](#how-to-log-efficiently)<br>
+* [How to handle error](#error-handling)<br>
 
 ## Logger
 > EpicLogger is a core interface that centralizes common logging functionality while offering great flexibility to be extended to support any logger client. <br>The design aligns with Go's philosophy of promoting simplicity without compromising power.
@@ -61,10 +64,12 @@ type LoggerEpic interface {
 
 ## JWT
 
+## File System
+
 
 ## Context
 ### What is context and why you should use it?
-[What is context?]()<br>
+[What is context?](https://gobyexample.com/context)<br>
 Why you should use it?<br>
 This is an important question to answer. Context is the recommended way to pass data and signals throughout the lifecycle of your application. For an API server, it provides several benefits.
 
@@ -129,3 +134,7 @@ You can initially create context in a Middleware right after JWT is decoded into
 	}
 }
 ```
+
+## How to log (*efficiently*)
+
+## Error handling
