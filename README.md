@@ -1,7 +1,7 @@
-# EPIC Go Standard Library & Best Practice
+# EPIC Go Standard Libraries & Best Practices
 ![gopher](./epic-gopher.png)
 
-Collection of Go libraries for [Epic-Consulting](https://www.epic-consulting.net/), Designed with "*Simplicity* and *Flexibility*" in mind.
+Collection of Go libraries for [Epic-Consulting](https://www.epic-consulting.net/), Designed with "*Simplicity* and *Flexibility*".
 
 ## Quick Start
 ```bash
@@ -23,7 +23,8 @@ Best practices<br>
 * [How to handle error](#error-handling)<br>
 
 ## Logger
-> EpicLogger is a core interface that centralizes common logging functionality while offering great flexibility to be extended to support any logger client. <br>The design aligns with Go's philosophy of promoting simplicity without compromising power.
+> EpicLogger is a core interface that centralizes common logging functionality while offering great flexibility to be extended to support any logger client. <br>
+> The design pattern used in the logger package is **Singleton** which ensures that the logger is instantiated only once and is thread-safe.
 
 ### Create Logger Instance.
 ```pkgep``` provides [*Logrus*](https://github.com/sirupsen/logrus) as the default logger client that fully implemeted **EpicLogger** interface. you can start using it right away like so.
